@@ -39,11 +39,11 @@ CPP_FILES = \
 INCLUDES = -I.
 
 # CPPFLAGS = compiler options for C and C++
-CPPFLAGS = -Wall -Wno-sign-compare -Wno-strict-aliasing -g -Os -mcpu=cortex-m4 \
+CPPFLAGS = -Wall -Wno-sign-compare -Wno-strict-aliasing -g -Os -mcpu=cortex-m4 -mfloat-abi=soft -mfpu=fpv4-sp-d16 \
 	-mthumb -nostdlib -MMD -Werror $(OPTIONS) $(INCLUDES)
 
 # compiler options for C++ only
-CXXFLAGS = -std=gnu++0x -felide-constructors -fno-exceptions -fno-rtti
+CXXFLAGS = -std=gnu++0x -felide-constructors -fno-exceptions -fno-rtti 
 
 # compiler options for C only
 CFLAGS =
@@ -55,7 +55,7 @@ LDSCRIPT = fcb-app.ld
 LDFLAGS = -Os -Wl,--gc-sections -mcpu=cortex-m4 -mthumb -nostdlib -T$(LDSCRIPT)
 
 # additional libraries to link
-LIBS = -lm
+LIBS = -lm -lgcc
 
 OBJS := $(C_FILES:.c=.o) $(CPP_FILES:.cpp=.o)
 
@@ -71,7 +71,7 @@ $(TARGET).elf: $(OBJS) $(LDSCRIPT)
 
 %.hex: %.elf
 	$(OBJCOPY) -O ihex $< $(APP_HEX)
-	(grep -v :00000001FF $(FCBOOT_IMAGE); cat $(APP_HEX)) > $@
+	(grep -v :00000001FF $(FCBOOT_IMAGE) & type $(APP_HEX)) > $@
 
 install: $(TARGET).dfu
 	$(DFU_UTIL) -d 1d50 -D $<
@@ -83,7 +83,7 @@ benchmark: install
 -include $(OBJS:.o=.d)
 
 clean:
-	rm -f *.d *.o $(TARGET).elf $(TARGET).dfu $(APP_HEX)
+	del *.d *.o $(TARGET).elf $(TARGET).dfu $(APP_HEX)
 
 disassemble: $(TARGET).elf
 	$(OBJDUMP) -d $< | less

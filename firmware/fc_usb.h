@@ -69,7 +69,7 @@ struct fcPacketBuffer
 
 struct fcFramebuffer : public fcPacketBuffer<PACKETS_PER_FRAME>
 {
-    ALWAYS_INLINE const uint8_t* pixel(unsigned index)
+    ALWAYS_INLINE uint8_t* pixel(unsigned index)
     {
         return &packets[index / PIXELS_PER_PACKET]->buf[1 + (index % PIXELS_PER_PACKET) * 3];
     }
@@ -143,7 +143,6 @@ struct fcBuffers
     // Main loop context
     void finalizeFrame();
 
-private:
     void finalizeFramebuffer();
     void finalizeLUT();
 
